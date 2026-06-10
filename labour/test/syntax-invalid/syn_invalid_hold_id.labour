@@ -1,0 +1,30 @@
+// PARSE ERROR (rule 9, enforced by the grammar): hold ids must be exactly
+// four digits, but "12" has only two.
+bouldering_wall "ShortIdWall" {
+  routes [
+    bouldering_route "short id" {
+      grade: "5A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["12", "0002"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "12" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red ]
+        },
+        hold "0002" {
+          pos: { x: 5, y: 5 },
+          shape: "1",
+          colours [ red ]
+        }
+      ]
+    }
+  ]
+}

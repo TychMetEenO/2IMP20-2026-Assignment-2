@@ -1,0 +1,49 @@
+// VALID: a route that splits into two sub-routes that never merge, so each
+// sub-route ends in its own end hold — two end holds are allowed exactly
+// because the route splits (rule 7).
+bouldering_wall "SplitWall" {
+  routes [
+    bouldering_route "forked finish" {
+      grade: "6C",
+      grid_base_point { x: 5, y: 0 },
+      holds ["0001", {"0002", "0003"}, {"0004", "0005"}]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 60, y: 150 },
+      depth: 15,
+      radius: 45,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "21",
+          colours [ blue ],
+          start_hold: 1
+        },
+        hold "0002" {
+          pos: { x: -10, y: 15 },
+          shape: "22",
+          colours [ blue, yellow ]
+        },
+        hold "0003" {
+          pos: { x: 10, y: 15 },
+          shape: "22",
+          colours [ blue ]
+        },
+        hold "0004" {
+          pos: { x: -12, y: 30 },
+          shape: "23",
+          colours [ blue ],
+          end_hold
+        },
+        hold "0005" {
+          pos: { x: 12, y: 30 },
+          shape: "23",
+          colours [ blue ],
+          end_hold
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+// VALID: exercises the notation variants that appear in the assignment's
+// listings: the colon-less position spelling `pos { ... }` of Listing 1,
+// an angle-positioned hold in side_holds (Listing 2), rotation before
+// colours (Listing 1's property order), and line comments (Listing 3).
+bouldering_wall "Notation42" {
+  routes [
+    bouldering_route "around the barrel" {
+      grade: "7A",
+      grid_base_point { x: 120, y: 40 },
+      holds ["0010", "0011", "0012"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 200, y: 180 },
+      depth: 35, // a barrel sticking out of the wall
+      radius: 60,
+      front_holds [
+        hold "0010" {
+          pos { x: 30, y: 70 }, // Listing-1 style: no colon after pos
+          shape: "107",
+          colours [ purple, pink ],
+          start_hold: 1,
+          rotation: 30
+        },
+        hold "0012" {
+          pos: { x: 0, y: 55 },
+          shape: "108",
+          rotation: 359,
+          colours [ purple ],
+          end_hold
+        }
+      ],
+      side_holds [
+        hold "0011" {
+          pos: { angle: 330 }, // angle around the cylinder side surface
+          shape: "42",
+          colours [ purple, white ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+// INVALID (rule 1): the wall has a volume but no route at all.
+bouldering_wall "NoRoutesWall" {
+  routes [],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red ]
+        }
+      ]
+    }
+  ]
+}

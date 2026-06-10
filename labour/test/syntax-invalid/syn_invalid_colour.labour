@@ -1,0 +1,30 @@
+// PARSE ERROR (rule 15, enforced by the grammar): "cyan" is not one of the
+// nine valid colour names.
+bouldering_wall "BadColourWall" {
+  routes [
+    bouldering_route "cyanide" {
+      grade: "5A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", "0002"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ cyan ]
+        },
+        hold "0002" {
+          pos: { x: 5, y: 5 },
+          shape: "1",
+          colours [ red ]
+        }
+      ]
+    }
+  ]
+}

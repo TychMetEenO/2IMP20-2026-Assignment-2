@@ -1,0 +1,33 @@
+// INVALID (rule 13): an angle position must be between 0 and 359, but hold
+// "0002" uses angle 360.
+bouldering_wall "BadAngleWall" {
+  routes [
+    bouldering_route "full circle" {
+      grade: "5A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", "0002"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red ],
+          start_hold: 1
+        }
+      ],
+      side_holds [
+        hold "0002" {
+          pos: { angle: 360 },
+          shape: "1",
+          colours [ red ]
+        }
+      ]
+    }
+  ]
+}

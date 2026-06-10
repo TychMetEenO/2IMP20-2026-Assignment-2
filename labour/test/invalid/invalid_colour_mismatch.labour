@@ -1,0 +1,37 @@
+// INVALID (rule 11): the route's holds do not share a common colour — the
+// intersection of {red, yellow}, {red, blue} and {blue} is empty, even
+// though each pair of neighbouring holds overlaps.
+bouldering_wall "ColourClashWall" {
+  routes [
+    bouldering_route "rainbow" {
+      grade: "5A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", "0002", "0003"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red, yellow ],
+          start_hold: 1
+        },
+        hold "0002" {
+          pos: { x: 5, y: 5 },
+          shape: "1",
+          colours [ red, blue ]
+        },
+        hold "0003" {
+          pos: { x: 10, y: 10 },
+          shape: "1",
+          colours [ blue ]
+        }
+      ]
+    }
+  ]
+}

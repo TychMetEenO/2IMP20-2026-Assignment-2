@@ -1,0 +1,41 @@
+// INVALID (rule 4): a split may create no more than two sub-routes, but the
+// braced group contains three hold ids.
+bouldering_wall "ThreeWaysWall" {
+  routes [
+    bouldering_route "trident" {
+      grade: "6A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", {"0002", "0003", "0004"}]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red ],
+          start_hold: 1
+        },
+        hold "0002" {
+          pos: { x: 2, y: 5 },
+          shape: "1",
+          colours [ red ]
+        },
+        hold "0003" {
+          pos: { x: 4, y: 5 },
+          shape: "1",
+          colours [ red ]
+        },
+        hold "0004" {
+          pos: { x: 6, y: 5 },
+          shape: "1",
+          colours [ red ]
+        }
+      ]
+    }
+  ]
+}

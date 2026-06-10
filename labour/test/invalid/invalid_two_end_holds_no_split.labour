@@ -1,0 +1,38 @@
+// INVALID (rule 7): the route does not split, so it may have at most one
+// end hold, but two holds are marked end_hold.
+bouldering_wall "TwoEndsWall" {
+  routes [
+    bouldering_route "double finish" {
+      grade: "5C",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", "0002", "0003"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red ],
+          start_hold: 1
+        },
+        hold "0002" {
+          pos: { x: 5, y: 5 },
+          shape: "1",
+          colours [ red ],
+          end_hold
+        },
+        hold "0003" {
+          pos: { x: 10, y: 10 },
+          shape: "1",
+          colours [ red ],
+          end_hold
+        }
+      ]
+    }
+  ]
+}

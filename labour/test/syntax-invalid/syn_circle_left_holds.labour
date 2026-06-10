@@ -1,0 +1,30 @@
+// PARSE ERROR (rule 18, enforced by the grammar): a circle may only contain
+// front_holds or side_holds lists, not left_holds.
+bouldering_wall "CircleLeftWall" {
+  routes [
+    bouldering_route "wrong face" {
+      grade: "5A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", "0002"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      left_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red ]
+        },
+        hold "0002" {
+          pos: { x: 5, y: 5 },
+          shape: "1",
+          colours [ red ]
+        }
+      ]
+    }
+  ]
+}

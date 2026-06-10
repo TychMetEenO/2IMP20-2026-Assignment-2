@@ -1,0 +1,32 @@
+// VALID: smallest sensible wall — one volume, one route with exactly two
+// holds (the rule-2 minimum), one start hold, and no end hold (the route is
+// finished by climbing over the top of the wall, which the spec allows).
+bouldering_wall "MinimalWall1" {
+  routes [
+    bouldering_route "easy slab" {
+      grade: "4A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", "0002"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 100, y: 100 },
+      depth: 20,
+      radius: 40,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 10 },
+          shape: "12",
+          colours [ green ],
+          start_hold: 1
+        },
+        hold "0002" {
+          pos: { x: 5, y: 30 },
+          shape: "7",
+          colours [ green, black ]
+        }
+      ]
+    }
+  ]
+}

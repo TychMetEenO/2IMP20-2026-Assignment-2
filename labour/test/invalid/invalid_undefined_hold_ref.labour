@@ -1,0 +1,31 @@
+// INVALID (reference check): the route references hold "0099", which is not
+// defined in any volume of the wall.
+bouldering_wall "DanglingRefWall" {
+  routes [
+    bouldering_route "ghost hold" {
+      grade: "5A",
+      grid_base_point { x: 0, y: 0 },
+      holds ["0001", "0002", "0099"]
+    }
+  ],
+  volumes [
+    circle {
+      pos: { x: 50, y: 50 },
+      depth: 10,
+      radius: 30,
+      front_holds [
+        hold "0001" {
+          pos: { x: 0, y: 0 },
+          shape: "1",
+          colours [ red ],
+          start_hold: 1
+        },
+        hold "0002" {
+          pos: { x: 5, y: 5 },
+          shape: "1",
+          colours [ red ]
+        }
+      ]
+    }
+  ]
+}
