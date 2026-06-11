@@ -16,9 +16,6 @@ import labour::Syntax;
  *   (surrounding quotes stripped), IntegerLit -> int, Colour -> str.
  * - Separated lists (star or plus, {X ","}...) are mapped to list[...] by
  *   comprehension.
- * - The two concrete spellings of a hold position (`pos:` and `pos`, both
- *   used by the assignment's listings) map to the same AST constructors via
- *   the shared pos2ast helper, so the AST is notation-independent.
  * - The face-hold sections of a volume (front/side resp. left/right/bottom)
  *   are collected per face by filtering the star list with a concrete
  *   pattern; repeated sections of the same face are concatenated.
@@ -29,7 +26,7 @@ import labour::Syntax;
 // Entry point, as called by Plugin::checkWellformedness
 BoulderingWall cst2ast(start[BoulderingWall] wall) = cst2ast(wall.top);
 
-BoulderingWall cst2ast(w:(BoulderingWall)`bouldering_wall <StringLit name> { <Routes rs> , <Volumes vs> }`)
+BoulderingWall cst2ast(w:(BoulderingWall)`bouldering_wall <StringLit name> : { <Routes rs> , <Volumes vs> }`)
   = boulderingWall(unquote(name), cst2ast(rs), cst2ast(vs), src=w.src);
 
 // ---------- Routes ----------
@@ -42,7 +39,7 @@ BoulderingWall cst2ast(w:(BoulderingWall)`bouldering_wall <StringLit name> { <Ro
 list[BoulderingRoute] cst2ast((Routes)`routes [ <{BoulderingRoute ","}* rs> ]`)
   = [cst2ast(r) | r <- rs];
 
-BoulderingRoute cst2ast(r:(BoulderingRoute)`bouldering_route <StringLit name> { grade : <StringLit g> , grid_base_point { x : <IntegerLit x> , y : <IntegerLit y> } , holds [ <{RouteHoldRef ","}* hs> ] }`)
+BoulderingRoute cst2ast(r:(BoulderingRoute)`bouldering_route <StringLit name> : { grade : <StringLit g> , grid_base_point : { x : <IntegerLit x> , y : <IntegerLit y> } , holds [ <{RouteHoldRef ","}* hs> ] }`)
   = boulderingRoute(unquote(name), unquote(g), coord(toI(x), toI(y)),
                     [cst2ast(h) | h <- hs], src=r.src);
 
@@ -60,13 +57,13 @@ list[Volume] cst2ast((Volumes)`volumes [ <{Volume ","}* vs> ]`)
 Volume cst2ast((Volume)`<CircleVolume c>`) = cst2ast(c);
 Volume cst2ast((Volume)`<TriangleVolume t>`) = cst2ast(t);
 
-Volume cst2ast(c:(CircleVolume)`circle { pos : <XYCoord p> , depth : <IntegerLit d> , radius : <IntegerLit r> <CircleFaceHolds* fs> }`)
+Volume cst2ast(c:(CircleVolume)`circle : { pos : <XYCoord p> , depth : <IntegerLit d> , radius : <IntegerLit r> <CircleFaceHolds* fs> }`)
   = circle(cst2ast(p), toI(d), toI(r),
       [cst2ast(h) | (CircleFaceHolds)`, front_holds [ <{Hold ","}* hs> ]` <- fs, h <- hs],
       [cst2ast(h) | (CircleFaceHolds)`, side_holds [ <{Hold ","}* hs> ]` <- fs, h <- hs],
       src=c.src);
 
-Volume cst2ast(t:(TriangleVolume)`triangle { pos : <XYCoord p> , extrusion : <XYCoord e> , depth : <IntegerLit d> , corners [ <XYCoord c1> , <XYCoord c2> , <XYCoord c3> ] <TriangleFaceHolds* fs> }`)
+Volume cst2ast(t:(TriangleVolume)`triangle : { pos : <XYCoord p> , extrusion : <XYCoord e> , depth : <IntegerLit d> , corners [ <XYCoord c1> , <XYCoord c2> , <XYCoord c3> ] <TriangleFaceHolds* fs> }`)
   = triangle(cst2ast(p), cst2ast(e), toI(d),
       [cst2ast(c1), cst2ast(c2), cst2ast(c3)],
       [cst2ast(h) | (TriangleFaceHolds)`, left_holds [ <{Hold ","}* hs> ]` <- fs, h <- hs],
@@ -81,12 +78,11 @@ Coord cst2ast(c:(XYCoord)`{ x : <IntegerLit x> , y : <IntegerLit y> }`)
 
 // ---------- Holds ----------
 
-Hold cst2ast(h:(Hold)`hold <HoldIdLit id> { <{HoldProp ","}+ ps> }`)
+Hold cst2ast(h:(Hold)`hold <HoldIdLit id> : { <{HoldProp ","}+ ps> }`)
   = hold(unquote(id), [cst2ast(p) | p <- ps], src=h.src);
 
-// Both pos spellings map to the same AST constructors (see Syntax.rsc)
+// The HoldPos wrapper is flattened into the posXY/posAngle constructors
 HoldProp cst2ast(p:(HoldProp)`pos : <HoldPos hp>`) = pos2ast(hp, p.src);
-HoldProp cst2ast(p:(HoldProp)`pos <HoldPos hp>`)   = pos2ast(hp, p.src);
 
 HoldProp cst2ast(p:(HoldProp)`shape : <StringLit s>`)
   = shape(unquote(s), src=p.src);

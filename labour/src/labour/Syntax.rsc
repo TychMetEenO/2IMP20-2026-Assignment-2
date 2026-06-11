@@ -7,16 +7,19 @@ module labour::Syntax
  * - Hold properties use an order-independent {HoldProp ","}+ list because the
  *   examples in the spec show varying property orderings (e.g. rotation appears
  *   both before and after colours). Presence of required properties (pos, shape,
- *   colours) and absence of duplicates are validated in Check.rsc.
+ *   colours) is validated in Check.rsc.
  * - Volume and route bodies use a fixed ordering matching all provided examples.
  *   This keeps the grammar unambiguous without extra semantic deduplication in
  *   the syntax, and is consistent with everything in the spec.
  * - Hold IDs are restricted to exactly 4 decimal digits in the lexical rule,
  *   catching well-formedness rule 9 at parse time.
- * - The spec's listings are inconsistent about the colon after "pos": Listing 1
- *   writes `pos { x: 30, y: 70 }` while Listings 2/3/6 write `pos: { ... }`.
- *   We accept both spellings (posColon / posPlain); they map onto the same
- *   abstract syntax, since the difference is purely a matter of notation.
+ * - The spec's listings are inconsistent about the colon before a `{ ... }`
+ *   block (e.g. `pos { ... }` in Listing 1 vs `pos: { ... }` in Listings
+ *   2/3/6, and `grid_base_point { ... }` without one). We use one uniform
+ *   convention instead: every named `{ ... }` block is introduced by a colon
+ *   (`bouldering_wall "id": {`, `grid_base_point: {`, `circle: {`,
+ *   `hold "0001": {`, ...), while `[ ... ]` lists never take one, matching
+ *   the listings (`routes [`, `holds [`, `colours [`, ...).
  * - The hold lists of a volume (front/side resp. left/right/bottom) are star
  *   lists of "face" rules that carry their own leading comma. This makes every
  *   face list optional, allows the lists in any order, and lets CST2AST bind
@@ -27,8 +30,6 @@ module labour::Syntax
  *   rule 15), so invalid colour names are caught at parse time.
  * - The corners array of a triangle has exactly three XYCoord items, which
  *   enforces the "three corners" part of rule 19 at parse time.
- * - Line comments (`// ...`) are part of the layout because the spec's own
- *   listings (e.g. Listing 3) contain them.
  * - Minimum cardinalities (>= 1 volume/route, >= 2 route holds), value range
  *   checks (rotation 0-359, angle 0-359, start_hold 1 or 2), uniqueness of
  *   identifiers, and sub-route structure constraints are deferred to Check.rsc
@@ -36,11 +37,7 @@ module labour::Syntax
  *   context-free grammar cannot (reasonably) express.
  */
 
-lexical Comment = @category="comment" "//" ![\n\r]*;
-
-lexical WhitespaceOrComment = [\ \t\n\r] | Comment;
-
-layout Whitespace = WhitespaceOrComment* !>> [\ \t\n\r] !>> "//";
+layout Whitespace = [\ \t\n\r]* !>> [\ \t\n\r];
 
 // General quoted string for wall/route identifiers and hold shape names
 lexical StringLit = "\"" ![\"]* "\"";
@@ -54,7 +51,7 @@ lexical IntegerLit = "-"? [0-9]+ !>> [0-9];
 // ---------- Top-level ----------
 
 start syntax BoulderingWall
-  = boulderingWall: "bouldering_wall" StringLit "{" Routes "," Volumes "}"
+  = boulderingWall: "bouldering_wall" StringLit ":" "{" Routes "," Volumes "}"
   ;
 
 // ---------- Routes ----------
@@ -67,9 +64,9 @@ syntax Routes
 // examples; this also enforces rules 5 and 6 (all properties present, and the
 // grid_base_point having an x and a y component) at parse time.
 syntax BoulderingRoute
-  = boulderingRoute: "bouldering_route" StringLit "{"
+  = boulderingRoute: "bouldering_route" StringLit ":" "{"
       "grade" ":" StringLit ","
-      "grid_base_point" "{" "x" ":" IntegerLit "," "y" ":" IntegerLit "}" ","
+      "grid_base_point" ":" "{" "x" ":" IntegerLit "," "y" ":" IntegerLit "}" ","
       "holds" "[" {RouteHoldRef ","}* "]"
     "}"
   ;
@@ -94,7 +91,7 @@ syntax Volume
 
 // Circle: mandatory pos/depth/radius (rule 17, parse time)
 syntax CircleVolume
-  = circleVolume: "circle" "{"
+  = circleVolume: "circle" ":" "{"
       "pos" ":" XYCoord ","
       "depth" ":" IntegerLit ","
       "radius" ":" IntegerLit
@@ -111,7 +108,7 @@ syntax CircleFaceHolds
 // Triangle: mandatory pos/extrusion/depth/corners with exactly 3 corner items
 // (rule 19, parse time)
 syntax TriangleVolume
-  = triangleVolume: "triangle" "{"
+  = triangleVolume: "triangle" ":" "{"
       "pos" ":" XYCoord ","
       "extrusion" ":" XYCoord ","
       "depth" ":" IntegerLit ","
@@ -137,15 +134,13 @@ syntax XYCoord
 // ---------- Holds ----------
 
 syntax Hold
-  = hold: "hold" HoldIdLit "{" {HoldProp ","}+ "}"
+  = hold: "hold" HoldIdLit ":" "{" {HoldProp ","}+ "}"
   ;
 
-// Hold properties are order-independent; required/optional/duplicate
-// validation is in Check.rsc. The position property exists in two concrete
-// spellings ("pos:" and "pos", see module comment) that mean the same thing.
+// Hold properties are order-independent; required/optional validation is in
+// Check.rsc.
 syntax HoldProp
-  = posColon:     "pos" ":" HoldPos
-  | posPlain:     "pos" HoldPos
+  = posProp:      "pos" ":" HoldPos
   | shapeProp:    "shape" ":" StringLit
   | coloursProp:  "colours" "[" {Colour ","}+ "]"
   | startHold:    "start_hold" ":" IntegerLit

@@ -1,16 +1,13 @@
-// VALID: a route with the maximum of two start holds, labelled 1 and 2
-// (one per hand), and a single end hold. Also exercises a triangle with
-// holds on two different faces (left and right).
-bouldering_wall "TwoStartsWall" {
+bouldering_wall "TwoStartsWall": {
   routes [
-    bouldering_route "double start" {
+    bouldering_route "double start": {
       grade: "6B",
-      grid_base_point { x: 10, y: 0 },
+      grid_base_point: { x: 10, y: 0 },
       holds ["0001", "0002", "0003"]
     }
   ],
   volumes [
-    triangle {
+    triangle: {
       pos: { x: 0, y: 0 },
       extrusion: { x: 5, y: 5 },
       depth: 30,
@@ -20,13 +17,13 @@ bouldering_wall "TwoStartsWall" {
         { x: 0, y: 15 }
       ],
       left_holds [
-        hold "0001" {
+        hold "0001": {
           pos: { x: 1, y: 2 },
           shape: "3",
           colours [ red ],
           start_hold: 1
         },
-        hold "0002" {
+        hold "0002": {
           pos: { x: 3, y: 4 },
           shape: "3",
           colours [ red ],
@@ -34,7 +31,7 @@ bouldering_wall "TwoStartsWall" {
         }
       ],
       right_holds [
-        hold "0003" {
+        hold "0003": {
           pos: { x: 5, y: 6 },
           shape: "9",
           colours [ red, white ],

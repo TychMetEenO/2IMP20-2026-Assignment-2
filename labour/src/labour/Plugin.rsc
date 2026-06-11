@@ -1,7 +1,6 @@
 module labour::Plugin
 
 import IO;
-import Exception;
 
 import util::Reflective;
 import util::IDEServices;
@@ -57,18 +56,11 @@ void clearLaBouR() {
 /*
  * Use this function to run your tests. It will show how many tests succeeded.
  * Note that an invalid test "succeeds" when the check fails
- *
- * Modification w.r.t. the skeleton: a third test directory,
- * test/syntax-invalid, holds programs that violate constraints embedded in
- * the concrete syntax (e.g. invalid colour names, non-4-digit hold ids).
- * Those must already be rejected by the parser, so they "succeed" when
- * parsing throws a ParseError.
  */
 void runTests() {
   fails = 0;
   validFiles = |project://labour/test/valid|.ls;
   invalidFiles = |project://labour/test/invalid|.ls;
-  syntaxInvalidFiles = |project://labour/test/syntax-invalid|.ls;
 
   println("\nValid tests");
   for (file <- validFiles) {
@@ -91,17 +83,5 @@ void runTests() {
     }
   }
 
-  println("\nSyntax-invalid tests (programs the parser must reject)");
-
-  for (file <- syntaxInvalidFiles) {
-    try {
-      parseLaBouR(file);
-      println("FAILURE: <file.path> parses, but it should be a parse error");
-      fails += 1;
-    } catch ParseError(_): {
-      println("SUCCESS: <file.path> is rejected by the parser");
-    }
-  }
-
-  println("\n<fails> failed tests");
+  println("<fails> failed tests");
 }

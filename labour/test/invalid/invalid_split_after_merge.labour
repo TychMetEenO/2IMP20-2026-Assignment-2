@@ -1,51 +1,49 @@
-// INVALID (rules 4 and 8): the route splits, merges at "0007", and then
-// splits again — this is exactly the invalid example of Listing 5.
-bouldering_wall "ResplitWall" {
+bouldering_wall "ResplitWall": {
   routes [
-    bouldering_route "split merge split" {
+    bouldering_route "split merge split": {
       grade: "6A",
-      grid_base_point { x: 0, y: 0 },
+      grid_base_point: { x: 0, y: 0 },
       holds ["0001", "0002", {"0003", "0004"}, "0007", {"0005", "0006"}]
     }
   ],
   volumes [
-    circle {
+    circle: {
       pos: { x: 50, y: 50 },
       depth: 10,
       radius: 30,
       front_holds [
-        hold "0001" {
+        hold "0001": {
           pos: { x: 0, y: 0 },
           shape: "1",
           colours [ red ],
           start_hold: 1
         },
-        hold "0002" {
+        hold "0002": {
           pos: { x: 2, y: 5 },
           shape: "1",
           colours [ red ]
         },
-        hold "0003" {
+        hold "0003": {
           pos: { x: 4, y: 10 },
           shape: "1",
           colours [ red ]
         },
-        hold "0004" {
+        hold "0004": {
           pos: { x: 6, y: 10 },
           shape: "1",
           colours [ red ]
         },
-        hold "0005" {
+        hold "0005": {
           pos: { x: 8, y: 20 },
           shape: "1",
           colours [ red ]
         },
-        hold "0006" {
+        hold "0006": {
           pos: { x: 10, y: 20 },
           shape: "1",
           colours [ red ]
         },
-        hold "0007" {
+        hold "0007": {
           pos: { x: 9, y: 15 },
           shape: "1",
           colours [ red ]

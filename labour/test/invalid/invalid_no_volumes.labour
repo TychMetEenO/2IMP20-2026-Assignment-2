@@ -1,11 +1,8 @@
-// INVALID (rule 1): the wall has a route but no volume. As a consequence the
-// route's hold references necessarily cannot resolve either, so this file
-// also demonstrates the "referenced hold must be defined" check.
-bouldering_wall "NoVolumesWall" {
+bouldering_wall "NoVolumesWall": {
   routes [
-    bouldering_route "floating route" {
+    bouldering_route "floating route": {
       grade: "5B",
-      grid_base_point { x: 0, y: 0 },
+      grid_base_point: { x: 0, y: 0 },
       holds ["0001", "0002"]
     }
   ],

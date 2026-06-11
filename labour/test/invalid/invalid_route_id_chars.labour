@@ -1,26 +1,24 @@
-// INVALID (rule 10): wall and route identifiers may only contain
-// alphanumeric characters (and spaces); "no-good!" contains '-' and '!'.
-bouldering_wall "BadIdWall" {
+bouldering_wall "BadIdWall": {
   routes [
-    bouldering_route "no-good!" {
+    bouldering_route "no-good!": {
       grade: "5A",
-      grid_base_point { x: 0, y: 0 },
+      grid_base_point: { x: 0, y: 0 },
       holds ["0001", "0002"]
     }
   ],
   volumes [
-    circle {
+    circle: {
       pos: { x: 50, y: 50 },
       depth: 10,
       radius: 30,
       front_holds [
-        hold "0001" {
+        hold "0001": {
           pos: { x: 0, y: 0 },
           shape: "1",
           colours [ red ],
           start_hold: 1
         },
-        hold "0002" {
+        hold "0002": {
           pos: { x: 5, y: 5 },
           shape: "1",
           colours [ red ]

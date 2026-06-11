@@ -11,16 +11,15 @@ module labour::AST
  * - Colours become plain str values (rather than an enum-like ADT) because the
  *   grammar already guarantees that only the nine valid colour names can
  *   occur; str makes the set-intersection check in Check.rsc trivial.
- * - The two concrete spellings of a hold position ("pos:" and "pos") and the
- *   wrapper HoldPos non-terminal collapse into the posXY/posAngle
- *   constructors; the notation difference carries no meaning.
+ * - The wrapper HoldPos non-terminal collapses into the posXY/posAngle
+ *   constructors; the wrapper carries no meaning of its own.
  * - The optional face-hold lists of a volume map to plain (possibly empty)
  *   lists, so the checker can treat "absent" and "empty" uniformly. Circle
  *   keeps front/side lists, triangle keeps left/right/bottom lists, mirroring
  *   rules 18 and 20 of the spec.
  * - Hold properties stay a list[HoldProp] (instead of fixed fields) because
- *   the concrete syntax allows them in any order and multiplicity; presence,
- *   duplication and value-range constraints are validated in Check.rsc.
+ *   the concrete syntax allows them in any order and multiplicity; presence
+ *   and value-range constraints are validated in Check.rsc.
  * - Every node carries a src keyword field (defaulting to |unknown:///|) that
  *   CST2AST fills with the source location of the concrete node, enabling
  *   precise error reporting.

@@ -1,37 +1,36 @@
-// INVALID (rule 3): the route has three start holds; at most two are allowed.
-bouldering_wall "ThreeStartsWall" {
+bouldering_wall "ThreeStartsWall": {
   routes [
-    bouldering_route "too many starts" {
+    bouldering_route "too many starts": {
       grade: "5A",
-      grid_base_point { x: 0, y: 0 },
+      grid_base_point: { x: 0, y: 0 },
       holds ["0001", "0002", "0003", "0004"]
     }
   ],
   volumes [
-    circle {
+    circle: {
       pos: { x: 50, y: 50 },
       depth: 10,
       radius: 30,
       front_holds [
-        hold "0001" {
+        hold "0001": {
           pos: { x: 0, y: 0 },
           shape: "1",
           colours [ red ],
           start_hold: 1
         },
-        hold "0002" {
+        hold "0002": {
           pos: { x: 5, y: 5 },
           shape: "1",
           colours [ red ],
           start_hold: 2
         },
-        hold "0003" {
+        hold "0003": {
           pos: { x: 10, y: 10 },
           shape: "1",
           colours [ red ],
           start_hold: 1
         },
-        hold "0004" {
+        hold "0004": {
           pos: { x: 15, y: 15 },
           shape: "1",
           colours [ red ]

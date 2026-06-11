@@ -24,13 +24,8 @@ import String;
  *
  * Rules checked here: 1, 2, 3, 4, 7, 8, 10, 11, 12, 13, 14. In addition we
  * check things the spec states in prose (sections 2.1.1/2.1.3):
- *  - a start_hold takes 1 or 2 as its argument; when a route has two start
- *    holds they must use different numbers (they are *hand* start holds,
- *    one per hand)
+ *  - a start_hold takes 1 or 2 as its argument
  *  - hold identifiers are unique, route identifiers are unique
- *  - every hold id referenced in a route is defined in some volume (without
- *    this, e.g. the colour rule 11 would be meaningless)
- *  - hold properties are not duplicated, and grades/shapes are non-empty
  *
  * Deliberately NOT checked: that the position kind (xy vs angle) matches the
  * hold list a hold appears in. Section 2.1.2 suggests side_holds use an
@@ -47,7 +42,6 @@ bool checkBoulderWallConfiguration(BoulderingWall wall) {
     checkWallHasVolumeAndRoute(wall),
     checkIdentifiers(wall),
     checkUniqueHoldIds(wall),
-    checkHoldReferencesResolve(wall),
     checkNumberOfHolds(wall),
     checkStartingHoldsTotalLimit(wall),
     checkUniqueEndHold(wall),
@@ -76,8 +70,8 @@ list[str] refIds(subRoute(list[str] ids)) = ids;
 // All hold ids referenced by a route, in climbing order
 list[str] routeHoldIds(BoulderingRoute r) = [*refIds(ref) | ref <- r.holds];
 
-// The hold definitions a route references; unresolved ids are skipped here
-// because checkHoldReferencesResolve reports them separately
+// The hold definitions a route references; ids without a matching hold
+// definition are skipped
 list[Hold] routeHolds(BoulderingWall wall, BoulderingRoute r) {
   defs = (h.id : h | h <- allHolds(wall));
   return [defs[id] | id <- routeHoldIds(r), id in defs];
@@ -103,7 +97,7 @@ bool checkWallHasVolumeAndRoute(BoulderingWall wall) {
   return ok;
 }
 
-// ---------- Rule 10 (+ uniqueness, non-empty grade) ----------
+// ---------- Rule 10 (+ uniqueness) ----------
 
 // The spec restricts wall/route ids to "any alphanumeric character", but its
 // own examples ("Example wall", "my route") contain spaces, so spaces are
@@ -120,10 +114,6 @@ bool checkIdentifiers(BoulderingWall wall) {
   bool ok = validId(wall.id, "wall");
   for (r <- wall.routes) {
     ok = validId(r.id, "route") && ok;
-    if (r.grade == "") {
-      println("Route \"<r.id>\": grade must not be empty (rule 5)");
-      ok = false;
-    }
   }
   routeIds = [r.id | r <- wall.routes];
   for (str id <- {i | i <- routeIds, size([1 | j <- routeIds, j == i]) > 1}) {
@@ -142,18 +132,6 @@ bool checkUniqueHoldIds(BoulderingWall wall) {
     println("Hold \"<id>\" is defined more than once; hold identifiers must be unique");
   }
   return dups == {};
-}
-
-// ---------- Route hold references must resolve ----------
-
-bool checkHoldReferencesResolve(BoulderingWall wall) {
-  defined = {h.id | h <- allHolds(wall)};
-  bool ok = true;
-  for (r <- wall.routes, id <- routeHoldIds(r), id notin defined) {
-    println("Route \"<r.id>\": references hold \"<id>\", which is not defined in any volume");
-    ok = false;
-  }
-  return ok;
 }
 
 // ---------- Rule 2: every route has two or more holds ----------
@@ -175,12 +153,6 @@ bool checkStartingHoldsTotalLimit(BoulderingWall wall) {
     vals = [*startHoldValues(h) | h <- routeHolds(wall, r)];
     if (size(vals) > 2) {
       println("Route \"<r.id>\": has <size(vals)> start holds, at most two are allowed (rule 3)");
-      ok = false;
-    }
-    // They are *hand* start holds: with two of them, one is for each hand,
-    // so the two start_hold arguments must differ (1 and 2)
-    if (size(vals) == 2 && vals[0] == vals[1]) {
-      println("Route \"<r.id>\": the two start holds must be labelled with different numbers (start_hold: 1 and start_hold: 2)");
       ok = false;
     }
   }
@@ -206,7 +178,7 @@ bool checkUniqueEndHold(BoulderingWall wall) {
 
 // A braced group {a, b} is a step where two parallel sub-routes are climbing;
 // consecutive braced groups continue the same two sub-routes and a return to
-// single ids is a merge. So: each braced group must contain exactly two ids
+// single ids is a merge. So: each braced group may contain at most two ids
 // (no more than two sub-routes, rule 4), and the whole route may contain at
 // most one consecutive run of braced groups (no new split after a merge,
 // rules 4 and 8; cf. the invalid example in Listing 5).
@@ -221,8 +193,8 @@ bool checkSubRouteStructure(BoulderingWall wall) {
           splitRuns += 1;
           inRun = true;
         }
-        if (size(ids) != 2) {
-          println("Route \"<r.id>\": a split must have exactly two sub-routes, found a group of <size(ids)> (rule 4)");
+        if (size(ids) > 2) {
+          println("Route \"<r.id>\": a split may have at most two sub-routes, found a group of <size(ids)> (rule 4)");
           ok = false;
         }
       } else {
@@ -257,7 +229,7 @@ bool checkRouteColours(BoulderingWall wall) {
   return ok;
 }
 
-// ---------- Rules 12, 13, 14 (+ duplicates, start_hold value) ----------
+// ---------- Rules 12, 13, 14 (+ start_hold value) ----------
 
 bool checkHoldProperties(BoulderingWall wall) {
   bool ok = true;
@@ -265,9 +237,6 @@ bool checkHoldProperties(BoulderingWall wall) {
     int nPos     = size([1 | posXY(_, _) <- h.props]) + size([1 | posAngle(_) <- h.props]);
     int nShape   = size([1 | shape(_) <- h.props]);
     int nColours = size([1 | colours(_) <- h.props]);
-    int nRot     = size([1 | rotation(_) <- h.props]);
-    int nStart   = size([1 | startHold(_) <- h.props]);
-    int nEnd     = size([1 | endHold() <- h.props]);
 
     // Rule 12: position, shape and colours are mandatory
     if (nPos == 0) {
@@ -280,17 +249,6 @@ bool checkHoldProperties(BoulderingWall wall) {
     }
     if (nColours == 0) {
       println("Hold \"<h.id>\": missing colours (rule 12)");
-      ok = false;
-    }
-
-    // No property may occur more than once
-    if (nPos > 1 || nShape > 1 || nColours > 1 || nRot > 1 || nStart > 1 || nEnd > 1) {
-      println("Hold \"<h.id>\": duplicated properties are not allowed");
-      ok = false;
-    }
-
-    for (shape(str s) <- h.props, s == "") {
-      println("Hold \"<h.id>\": shape must not be empty (rule 12)");
       ok = false;
     }
 

@@ -1,33 +1,31 @@
-// INVALID (spec 2.1.1): hold identifiers must be unique, but "0001" is
-// defined twice (once in each face list).
-bouldering_wall "DupHoldWall" {
+bouldering_wall "DupHoldWall": {
   routes [
-    bouldering_route "twins" {
+    bouldering_route "twins": {
       grade: "5A",
-      grid_base_point { x: 0, y: 0 },
+      grid_base_point: { x: 0, y: 0 },
       holds ["0001", "0002"]
     }
   ],
   volumes [
-    circle {
+    circle: {
       pos: { x: 50, y: 50 },
       depth: 10,
       radius: 30,
       front_holds [
-        hold "0001" {
+        hold "0001": {
           pos: { x: 0, y: 0 },
           shape: "1",
           colours [ red ],
           start_hold: 1
         },
-        hold "0002" {
+        hold "0002": {
           pos: { x: 5, y: 5 },
           shape: "1",
           colours [ red ]
         }
       ],
       side_holds [
-        hold "0001" {
+        hold "0001": {
           pos: { angle: 45 },
           shape: "2",
           colours [ red ]
