@@ -1,42 +1,5 @@
 module labour::Syntax
 
-/*
- * Concrete syntax for LaBouR (Language for Bouldering Routes).
- *
- * Design decisions:
- * - Hold properties use an order-independent {HoldProp ","}+ list because the
- *   examples in the spec show varying property orderings (e.g. rotation appears
- *   both before and after colours). Presence of required properties (pos, shape,
- *   colours) is validated in Check.rsc.
- * - Volume and route bodies use a fixed ordering matching all provided examples.
- *   This keeps the grammar unambiguous without extra semantic deduplication in
- *   the syntax, and is consistent with everything in the spec.
- * - Hold IDs are restricted to exactly 4 decimal digits in the lexical rule,
- *   catching well-formedness rule 9 at parse time.
- * - The spec's listings are inconsistent about the colon before a `{ ... }`
- *   block (e.g. `pos { ... }` in Listing 1 vs `pos: { ... }` in Listings
- *   2/3/6, and `grid_base_point { ... }` without one). We use one uniform
- *   convention instead: every named `{ ... }` block is introduced by a colon
- *   (`bouldering_wall "id": {`, `grid_base_point: {`, `circle: {`,
- *   `hold "0001": {`, ...), while `[ ... ]` lists never take one, matching
- *   the listings (`routes [`, `holds [`, `colours [`, ...).
- * - The hold lists of a volume (front/side resp. left/right/bottom) are star
- *   lists of "face" rules that carry their own leading comma. This makes every
- *   face list optional, allows the lists in any order, and lets CST2AST bind
- *   all of them with a single star variable instead of awkward optionals.
- *   A repeated face list (e.g. two front_holds sections) is not forbidden by
- *   the spec; CST2AST simply concatenates them.
- * - Valid colours are enumerated in the Colour non-terminal (well-formedness
- *   rule 15), so invalid colour names are caught at parse time.
- * - The corners array of a triangle has exactly three XYCoord items, which
- *   enforces the "three corners" part of rule 19 at parse time.
- * - Minimum cardinalities (>= 1 volume/route, >= 2 route holds), value range
- *   checks (rotation 0-359, angle 0-359, start_hold 1 or 2), uniqueness of
- *   identifiers, and sub-route structure constraints are deferred to Check.rsc
- *   because they require counting, arithmetic or cross-referencing that a
- *   context-free grammar cannot (reasonably) express.
- */
-
 layout Whitespace = [\ \t\n\r]* !>> [\ \t\n\r];
 
 // General quoted string for wall/route identifiers and hold shape names
