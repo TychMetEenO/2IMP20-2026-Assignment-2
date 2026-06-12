@@ -1,32 +1,20 @@
 module labour::Syntax
 
-layout Whitespace = [\ \t\n\r]* !>> [\ \t\n\r];
+layout Whitespace = [\ \t\n\r]* !>> [\ \t\n\r]; // Skips spaces in the entire syntax.
 
-// General quoted string for wall/route identifiers and hold shape names
-lexical StringLit = "\"" ![\"]* "\"";
-
-// Hold IDs: exactly four decimal digits, quoted (well-formedness rule 9)
-lexical HoldIdLit = "\"" [0-9][0-9][0-9][0-9] "\"";
-
-// Integer literal allowing negative values (e.g. depth: -10)
-lexical IntegerLit = "-"? [0-9]+ !>> [0-9];
-
-// ---------- Top-level ----------
+lexical StringLit = "\"" ![\"]* "\""; // Defines basic string type.
+lexical HoldIdLit = "\"" [0-9][0-9][0-9][0-9] "\""; // Defines type for hold id: exactly 4 numbers.
+lexical IntegerLit = "-"? [0-9]+ !>> [0-9]; // Defines type for numbers, allows for a minus sign and forces the entire string to be matched.
 
 start syntax BoulderingWall
   = boulderingWall: "bouldering_wall" StringLit ":" "{" Routes "," Volumes "}"
   ;
 
-// ---------- Routes ----------
-
-syntax Routes
+syntax Routes // Holds the list of routes.
   = routes: "routes" "[" {BoulderingRoute ","}* "]"
   ;
 
-// Route body has a fixed order (grade, grid_base_point, holds) per all spec
-// examples; this also enforces rules 5 and 6 (all properties present, and the
-// grid_base_point having an x and a y component) at parse time.
-syntax BoulderingRoute
+syntax BoulderingRoute  // Defines a route.
   = boulderingRoute: "bouldering_route" StringLit ":" "{"
       "grade" ":" StringLit ","
       "grid_base_point" ":" "{" "x" ":" IntegerLit "," "y" ":" IntegerLit "}" ","
@@ -34,26 +22,21 @@ syntax BoulderingRoute
     "}"
   ;
 
-// A route hold entry is a direct hold ID or a sub-route branch {id, id, ...}
-syntax RouteHoldRef
+syntax RouteHoldRef // contains either a hold or a reference to a subroute consisting of more refs.
   = single:   HoldIdLit
   | subRoute: "{" {HoldIdLit ","}+ "}"
   ;
 
-// ---------- Volumes ----------
-
-syntax Volumes
+syntax Volumes // Holds the list of volumes.
   = volumes: "volumes" "[" {Volume ","}* "]"
   ;
 
-// Only two volume kinds exist (rule 16), enforced at parse time
-syntax Volume
+syntax Volume // Volumes can be circles or triangles.
   = circle:   CircleVolume
   | triangle: TriangleVolume
   ;
 
-// Circle: mandatory pos/depth/radius (rule 17, parse time)
-syntax CircleVolume
+syntax CircleVolume // Defines a circle
   = circleVolume: "circle" ":" "{"
       "pos" ":" XYCoord ","
       "depth" ":" IntegerLit ","
@@ -62,15 +45,12 @@ syntax CircleVolume
     "}"
   ;
 
-// A circle may only contain front_holds/side_holds lists (rule 18, parse time)
-syntax CircleFaceHolds
+syntax CircleFaceHolds  // Circles can have front and/or side holds.
   = frontHolds: "," "front_holds" "[" {Hold ","}* "]"
   | sideHolds:  "," "side_holds"  "[" {Hold ","}* "]"
   ;
 
-// Triangle: mandatory pos/extrusion/depth/corners with exactly 3 corner items
-// (rule 19, parse time)
-syntax TriangleVolume
+syntax TriangleVolume // Defines a triangle.
   = triangleVolume: "triangle" ":" "{"
       "pos" ":" XYCoord ","
       "extrusion" ":" XYCoord ","
@@ -80,29 +60,21 @@ syntax TriangleVolume
     "}"
   ;
 
-// A triangle may only contain left/right/bottom hold lists (rule 20, parse time)
-syntax TriangleFaceHolds
+syntax TriangleFaceHolds  // A triangle can have left, right, and/or bottom holds.
   = leftHolds:   "," "left_holds"   "[" {Hold ","}* "]"
   | rightHolds:  "," "right_holds"  "[" {Hold ","}* "]"
   | bottomHolds: "," "bottom_holds" "[" {Hold ","}* "]"
   ;
 
-// ---------- Shared coordinate ----------
-
-// XYCoord is reused for volume pos, extrusion, triangle corners, and hold xy-position
-syntax XYCoord
+syntax XYCoord  // Defines the basic coord format.
   = xyCoord: "{" "x" ":" IntegerLit "," "y" ":" IntegerLit "}"
   ;
 
-// ---------- Holds ----------
-
-syntax Hold
+syntax Hold // A hold has an id and a set of properties.
   = hold: "hold" HoldIdLit ":" "{" {HoldProp ","}+ "}"
   ;
 
-// Hold properties are order-independent; required/optional validation is in
-// Check.rsc.
-syntax HoldProp
+syntax HoldProp // The set of properties holds can have.
   = posProp:      "pos" ":" HoldPos
   | shapeProp:    "shape" ":" StringLit
   | coloursProp:  "colours" "[" {Colour ","}+ "]"
@@ -111,18 +83,12 @@ syntax HoldProp
   | rotationProp: "rotation" ":" IntegerLit
   ;
 
-// A hold position is either an (x, y) coordinate or an angle (rule 12)
-syntax HoldPos
+syntax HoldPos // A hold has a position and a possible rotation.
   = posXY:    XYCoord
   | posAngle: "{" "angle" ":" IntegerLit "}"
   ;
 
-// start_hold value (1 or 2) and rotation/angle ranges (0-359) are value checks
-// that require arithmetic — validated in Check.rsc rather than the grammar.
-
-// ---------- Colours ----------
-
-// All valid colour literals (well-formedness rule 15), enforced at parse time
+// All possible color values.
 syntax Colour
   = white:  "white"
   | yellow: "yellow"
